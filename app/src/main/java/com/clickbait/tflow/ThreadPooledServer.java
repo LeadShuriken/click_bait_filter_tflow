@@ -15,7 +15,7 @@ import java.util.concurrent.Executors;
 public class ThreadPooledServer implements Runnable {
     
     private HttpServer server;
-    private ClientHttpThreadPool threadpool;
+    private ClientHttpHandler threadpool;
     private boolean isStopped = false;
 
     private int serverPort;
@@ -47,7 +47,7 @@ public class ThreadPooledServer implements Runnable {
     public void run() {
         try {
             server = HttpServer.create(new InetSocketAddress(serverPort), 0);
-            threadpool = new ClientHttpThreadPool();
+            threadpool = new ClientHttpHandler();
             server.createContext("/test", threadpool);
             server.setExecutor(Executors.newFixedThreadPool(threadPoolSize));
             server.start();

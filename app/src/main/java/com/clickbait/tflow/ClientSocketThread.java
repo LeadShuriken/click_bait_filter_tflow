@@ -26,7 +26,6 @@ class ClientSocketThread extends Thread {
             exchange.sendResponseHeaders(200, response.length());
             os = exchange.getResponseBody();
             os.write(response.getBytes());
-
             os.close();
         } catch (IOException e) {
             e.printStackTrace();
