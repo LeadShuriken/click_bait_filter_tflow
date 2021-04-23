@@ -13,24 +13,23 @@ import com.sun.net.httpserver.HttpServer;
 import java.util.concurrent.Executors;
 
 public class ThreadPooledServer implements Runnable {
+    
+    private HttpServer server;
+    private ClientHttpThreadPool threadpool;
+    private boolean isStopped = false;
 
-    protected int serverPort;
-    protected HttpServer server;
-    protected ClientHttpThreadPool threadpool;
-    protected boolean isStopped = false;
+    private int serverPort;
+    private int threadPoolSize;
 
     public ThreadPooledServer() {
         Map<String, LinkedHashMap<String, Object>> config = new Yaml()
                 .load(this.getClass().getClassLoader().getResourceAsStream("application.yml"));
         this.serverPort = (int) config.get("server").get("port");
+        this.threadPoolSize = (int) config.get("server").get("threadPoolSize");
     }
 
     public synchronized boolean isStopped() {
         return this.isStopped;
-    }
-
-    public synchronized void setStopped(Boolean stop) {
-        this.isStopped = stop;
     }
 
     public synchronized void stop() {
@@ -50,7 +49,7 @@ public class ThreadPooledServer implements Runnable {
             server = HttpServer.create(new InetSocketAddress(serverPort), 0);
             threadpool = new ClientHttpThreadPool();
             server.createContext("/test", threadpool);
-            server.setExecutor(Executors.newFixedThreadPool(10));
+            server.setExecutor(Executors.newFixedThreadPool(threadPoolSize));
             server.start();
         } catch (IOException ioe) {
             System.out.printf("Could not create server socket on port %d. Quitting.", serverPort);
