@@ -1,33 +1,35 @@
 package com.clickbait.tflow;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.sql.Connection;
+
 import com.sun.net.httpserver.HttpExchange;
 
 class ClientSocketThread extends Thread {
     HttpExchange exchange;
-    OutputStream os;
+    DBCPDataSource dsource;
 
     public ClientSocketThread() {
         super();
     }
 
-    ClientSocketThread(HttpExchange ex) {
+    ClientSocketThread(HttpExchange ex, DBCPDataSource ds) {
         exchange = ex;
+        dsource = ds;
     }
 
     public void run() {
-        try {
+        try (Connection con = dsource.getConnection()) {
             String caller = exchange.getLocalAddress().getHostName();
             System.out.println("Ping From - " + caller);
             String response = "Echo " + caller;
 
             exchange.sendResponseHeaders(200, response.length());
-            os = exchange.getResponseBody();
+            OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
             os.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
