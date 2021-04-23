@@ -10,6 +10,7 @@ import java.util.Map;
 import org.yaml.snakeyaml.Yaml;
 import java.net.InetSocketAddress;
 import com.sun.net.httpserver.HttpServer;
+import java.util.concurrent.Executors;
 
 public class ThreadPooledServer implements Runnable {
 
@@ -35,7 +36,7 @@ public class ThreadPooledServer implements Runnable {
     public synchronized void stop() {
         this.isStopped = true;
         try {
-            threadpool.stop();
+            server.stop(0);
             System.out.println("Server Stopped");
         } catch (Exception ioe) {
             System.out.println("Error Found stopping server socket");
@@ -49,7 +50,7 @@ public class ThreadPooledServer implements Runnable {
             server = HttpServer.create(new InetSocketAddress(serverPort), 0);
             threadpool = new ClientHttpThreadPool();
             server.createContext("/test", threadpool);
-            server.setExecutor(null);
+            server.setExecutor(Executors.newFixedThreadPool(10));
             server.start();
         } catch (IOException ioe) {
             System.out.printf("Could not create server socket on port %d. Quitting.", serverPort);
