@@ -1,8 +1,10 @@
 package com.clickbait.tflow;
 
+import java.io.IOException;
+
 public class ClickBaitTensorFlow {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         ThreadPooledServer server = new ThreadPooledServer();
         new Thread(server).start();
