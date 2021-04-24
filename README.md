@@ -74,6 +74,7 @@ This application is an **GRADLE APPLICATION USING THE GRADLE WRAPPER**;
  
   [JAVA11]: <https://www.oracle.com/java/technologies/javase-jdk11-downloads.html>
   [TENSORFLOW]: <https://www.tensorflow.org>
+  [POSTGRESQL]: <https://www.postgresql.org>
   [GRADLE]: <https://gradle.org>
   [JWT]: <https://jwt.io>
 

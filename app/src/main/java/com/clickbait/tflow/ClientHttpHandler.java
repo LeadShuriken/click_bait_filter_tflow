@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import com.google.common.base.Strings;
 import com.clickbait.tflow.config.DataSource;
 import com.clickbait.tflow.config.Encryption;
 import com.clickbait.tflow.config.Endpoint;
@@ -40,8 +39,8 @@ public class ClientHttpHandler implements HttpHandler {
     }
 
     private boolean compare(URI uri, HttpMethodType type, String auth, Endpoint end) {
-        return uri.equals(end.getPath()) && type.equals(end.getType()) && (!end.isAuthenticated()
-                || (!Strings.isNullOrEmpty(auth) && auth.startsWith(encryption.getPrefix() + " ")));
+        return uri.equals(end.getPath()) && type.equals(end.getType()) && (!end.isAuthenticated() || (auth != null
+                && auth.length() > encryption.getPrefix().length() && auth.startsWith(encryption.getPrefix() + " ")));
     }
 
     private String getAuth(HttpExchange exchange) {
