@@ -20,6 +20,7 @@ repositories {
 dependencies {
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.28'
     implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
+    implementation group: 'com.google.guava', name: 'guava', version: '28.1-jre'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.19'
     implementation group: 'org.tensorflow', name: 'tensorflow-core-platform', version: '0.3.1'
 }
