@@ -25,7 +25,7 @@ CLICKBAIT-FILTER-SERVICE requires [Node.js](https://nodejs.org/) v10+ to run.
 Install node dependancies for the project:
 ```sh
 $ cd click_bait_filter_be
-$ npm install
+$ gradlew assembleDevelopmentDebug --refresh-dependencies
 ```
 
 ## Applications Scopes
