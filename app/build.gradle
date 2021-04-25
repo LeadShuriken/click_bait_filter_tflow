@@ -18,6 +18,9 @@ repositories {
 }
 
 dependencies {
+    implementation group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.10.7'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.10.7'
+	implementation group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.10.7'
     implementation group: 'org.yaml', name: 'snakeyaml', version: '1.28'
     implementation group: 'commons-dbcp', name: 'commons-dbcp', version: '1.4'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.19'

@@ -6,15 +6,15 @@ import java.sql.Connection;
 import com.clickbait.tflow.dataSource.DBCPDataSource;
 import com.sun.net.httpserver.HttpExchange;
 
-public class ClientSocketThread extends Thread {
+public class GetScore extends Thread {
     HttpExchange exchange;
     DBCPDataSource connection;
 
-    public ClientSocketThread() {
+    public GetScore() {
         super();
     }
 
-    public ClientSocketThread(HttpExchange ex, DBCPDataSource con) {
+    public GetScore(HttpExchange ex, DBCPDataSource con) {
         exchange = ex;
         connection = con;
     }
