@@ -7,9 +7,18 @@ public class ApplicationConfig {
     private Encryption encryption;
     private DataSource datasource;
     private Map<String, Endpoint> endpoints;
+    private NLPModel nlpModel;
 
     public Server getServer() {
         return server;
+    }
+
+    public NLPModel getNlpModel() {
+        return nlpModel;
+    }
+
+    public void setNlpModel(NLPModel nlpModel) {
+        this.nlpModel = nlpModel;
     }
 
     public void setServer(Server server) {

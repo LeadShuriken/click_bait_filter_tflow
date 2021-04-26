@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Map;
 
-import com.clickbait.tflow.config.DataSource;
+import com.clickbait.tflow.config.ApplicationConfig;
 import com.clickbait.tflow.config.Encryption;
 import com.clickbait.tflow.config.Endpoint;
 import com.clickbait.tflow.dataSource.DBCPDataSource;
@@ -15,19 +15,23 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
+import org.tensorflow.SavedModelBundle;
+
 import io.jsonwebtoken.JwtException;
 
 public class ClientHttpHandler implements HttpHandler {
     private final DBCPDataSource dsource;
     private final Map<String, Endpoint> endpoints;
     private final Encryption encryption;
+    private final SavedModelBundle nlpModel;
     private final JWTUtils jwt;
 
-    ClientHttpHandler(DataSource dbProperties, Map<String, Endpoint> endP, Encryption enc) {
-        jwt = new JWTUtils(enc.getJwtConfig());
-        dsource = DBCPDataSource.getInstance(dbProperties);
-        endpoints = endP;
-        encryption = enc;
+    ClientHttpHandler(ApplicationConfig config) {
+        jwt = new JWTUtils(config.getEncryption().getJwtConfig());
+        dsource = DBCPDataSource.getInstance(config.getDatasource());
+        nlpModel = SavedModelBundle.load(config.getNlpModel().getPath(), "serve");
+        endpoints = config.getEndpoints();
+        encryption = config.getEncryption();
     }
 
     @Override

@@ -45,8 +45,7 @@ public class ThreadPooledServer implements Runnable {
         Server a = config.getServer();
         try {
             server = HttpServer.create(new InetSocketAddress(a.getPort()), 0);
-            server.createContext(a.getApi(),
-                    new ClientHttpHandler(config.getDatasource(), config.getEndpoints(), config.getEncryption()));
+            server.createContext(a.getApi(), new ClientHttpHandler(config));
             server.setExecutor(Executors.newFixedThreadPool(a.getThreadPoolSize()));
             server.start();
         } catch (IOException ioe) {

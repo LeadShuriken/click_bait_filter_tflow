@@ -5,6 +5,7 @@ import java.sql.Connection;
 
 import com.clickbait.tflow.dataSource.DBCPDataSource;
 import com.sun.net.httpserver.HttpExchange;
+import org.tensorflow.TensorFlow;
 
 public class GetScore extends Thread {
     HttpExchange exchange;
@@ -21,9 +22,7 @@ public class GetScore extends Thread {
 
     public void run() {
         try (Connection con = connection.getConnection()) {
-            String caller = exchange.getLocalAddress().getHostName();
-            System.out.println("Ping From - " + caller);
-            String response = "Echo " + caller;
+            String response = "Hello TensorFlow " + TensorFlow.version();
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
