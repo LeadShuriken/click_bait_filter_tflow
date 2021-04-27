@@ -14,7 +14,7 @@ public abstract class RootController extends Thread {
     final HttpExchange exchange;
     final DBCPDataSource connection;
 
-    public RootController(HttpExchange exchange, DBCPDataSource connection) {
+    protected RootController(HttpExchange exchange, DBCPDataSource connection) {
         this.exchange = exchange;
         this.connection = connection;
     }
