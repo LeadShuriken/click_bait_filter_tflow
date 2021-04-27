@@ -4,25 +4,19 @@ import java.io.OutputStream;
 import java.sql.Connection;
 
 import com.clickbait.tflow.dataSource.DBCPDataSource;
+import com.clickbait.tflow.exchange.LinkScoreRequest;
 import com.sun.net.httpserver.HttpExchange;
 import org.tensorflow.TensorFlow;
 
-public class GetScore extends Thread {
-    HttpExchange exchange;
-    DBCPDataSource connection;
+public class GetScore extends RootController {
 
-    public GetScore() {
-        super();
-    }
-
-    public GetScore(HttpExchange ex, DBCPDataSource con) {
-        exchange = ex;
-        connection = con;
+    public GetScore(HttpExchange exchange, DBCPDataSource connection) {
+        super(exchange, connection);
     }
 
     public void run() {
         try (Connection con = connection.getConnection()) {
-            String response = "Hello TensorFlow " + TensorFlow.version();
+            String response = TensorFlow.version() + " " + getBody(LinkScoreRequest.class);
             exchange.sendResponseHeaders(200, response.length());
             OutputStream os = exchange.getResponseBody();
             os.write(response.getBytes());
