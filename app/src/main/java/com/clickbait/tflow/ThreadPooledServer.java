@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 
 import com.clickbait.tflow.config.ApplicationConfig;
 import com.clickbait.tflow.config.Server;
+import com.clickbait.tflow.utilities.ClickBaitModelUtilities;
 import com.sun.net.httpserver.HttpServer;
 import java.util.concurrent.Executors;
 
@@ -44,6 +45,7 @@ public class ThreadPooledServer implements Runnable {
     public void run() {
         Server a = config.getServer();
         try {
+            ClickBaitModelUtilities.get(config.getModels().getClickBaitModel());
             server = HttpServer.create(new InetSocketAddress(a.getPort()), 0);
             server.createContext(a.getApi(), new ClientHttpHandler(config));
             server.setExecutor(Executors.newFixedThreadPool(a.getThreadPoolSize()));

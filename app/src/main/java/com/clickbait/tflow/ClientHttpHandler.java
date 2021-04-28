@@ -29,7 +29,7 @@ public class ClientHttpHandler implements HttpHandler {
     ClientHttpHandler(ApplicationConfig config) {
         jwt = new JWTUtils(config.getEncryption().getJwtConfig());
         dsource = DBCPDataSource.getInstance(config.getDatasource());
-        nlpModel = SavedModelBundle.load(config.getNlpModel().getPath(), "serve");
+        nlpModel = SavedModelBundle.load(config.getModels().getClickBaitModel().getModelPath(), "serve");
         endpoints = config.getEndpoints();
         encryption = config.getEncryption();
     }
@@ -40,7 +40,7 @@ public class ClientHttpHandler implements HttpHandler {
         HttpMethodType type = HttpMethodType.valueOf(exchange.getRequestMethod());
         String auth = getAuth(exchange);
         if (is(uri, type, auth, endpoints.get("getScore"))) {
-            new GetScore(exchange, dsource).run();
+            new GetScore(exchange, dsource, nlpModel).run();
         } else {
             exchange.sendResponseHeaders(400, 0);
             exchange.close();

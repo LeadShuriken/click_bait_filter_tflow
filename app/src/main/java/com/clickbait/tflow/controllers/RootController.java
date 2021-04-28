@@ -4,6 +4,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import com.sun.net.httpserver.HttpExchange;
+
+import org.tensorflow.SavedModelBundle;
+
 import com.clickbait.tflow.dataSource.DBCPDataSource;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -11,12 +14,16 @@ import com.google.gson.JsonSyntaxException;
 import java.io.IOException;
 
 public abstract class RootController extends Thread {
-    final HttpExchange exchange;
-    final DBCPDataSource connection;
+    protected final SavedModelBundle nlpModel;
+    protected final HttpExchange exchange;
+    protected final DBCPDataSource connection;
+    protected final Gson gson;
 
-    protected RootController(HttpExchange exchange, DBCPDataSource connection) {
+    protected RootController(HttpExchange exchange, DBCPDataSource connection, SavedModelBundle nlpModel) {
+        this.nlpModel = nlpModel;
         this.exchange = exchange;
         this.connection = connection;
+        this.gson = new Gson();
     }
 
     public abstract void run();
@@ -33,7 +40,6 @@ public abstract class RootController extends Thread {
     }
 
     protected <T> T getBody(Class<T> a) throws JsonSyntaxException, IOException {
-        Gson gson = new Gson();
         return gson.fromJson(readString(exchange.getRequestBody()), a);
     }
 }
