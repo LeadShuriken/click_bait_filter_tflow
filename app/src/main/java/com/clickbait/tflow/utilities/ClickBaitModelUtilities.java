@@ -2,9 +2,6 @@ package com.clickbait.tflow.utilities;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -16,8 +13,6 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import com.clickbait.tflow.config.ClickBaitModel;
-import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
 import org.tensorflow.Tensor;
 
 public class ClickBaitModelUtilities {
@@ -25,9 +20,6 @@ public class ClickBaitModelUtilities {
     private static ClickBaitModelUtilities sigleInstance = null;
     // NO DUAL PURPOSE / VAL / MATCH
     private final Pattern urlPattern = Pattern.compile("(([^\\/|=|?|_|-]+)(?=(\\.\\w+$)|(/+$)|-|_))+");
-
-    private final String[] splitOn = new String[] { "_", "-" };
-    private final String word = "^[a-z]+$";
 
     private final Map<String, Integer> clickBaitMapping;
     private final ClickBaitModel prop;
@@ -68,7 +60,7 @@ public class ClickBaitModelUtilities {
             }
         }
 
-        return Tensor.create(new long[] { 1, tLength }, FloatBuffer.wrap(Floats.toArray(Ints.asList(res))));
+        return Tensor.create(res, Float.class);
     }
 
     public Tensor<Float> getUrl(String[] urls) {
@@ -103,8 +95,8 @@ public class ClickBaitModelUtilities {
     }
 
     private String[] findSplit(String a) {
-        return Arrays.stream(splitOn).map(x -> a.split(x))
-                .map(x -> Arrays.stream(x).filter(y -> y.matches(word)).toArray(String[]::new))
+        return Arrays.stream(new String[] { "_", "-" }).map(x -> a.split(x))
+                .map(x -> Arrays.stream(x).filter(y -> y.matches("^[a-z]+$")).toArray(String[]::new))
                 .filter(x -> x.length > 3).findFirst().orElse(null);
     }
 
