@@ -43,7 +43,7 @@ public class ClickBaitModelUtilities {
     }
 
     public Tensor<Float> getUrl(String url) {
-        int[] res = new int[tLength];
+        float[][] res = new float[1][tLength];
         StringBuilder str = new StringBuilder(url);
 
         Matcher ma = urlPattern.matcher(str);
@@ -56,7 +56,7 @@ public class ClickBaitModelUtilities {
             int len = stringRes.size();
             int del = prop.isPostPadding() ? 0 : tLength - len;
             for (int i = 0; i < len; i++) {
-                res[del + i] = getEntry(stringRes.get(i));
+                res[0][del + i] = getEntry(stringRes.get(i));
             }
         }
 
