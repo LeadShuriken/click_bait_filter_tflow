@@ -1,14 +1,34 @@
 package com.clickbait.tflow.config;
 
+import org.tensorflow.framework.TensorInfo;
+
 public class ClickBaitModel {
     private String modelPath;
     private String mappingPath;
     private int max1DTensorAxis0;
     private boolean postPadding;
     private String notFound;
+    private TensorInfo inputTensorInfo;
+    private TensorInfo outputTensorInfo;
 
     public int getMax1DTensorAxis0() {
         return max1DTensorAxis0;
+    }
+
+    public TensorInfo getInputTensorInfo() {
+        return inputTensorInfo;
+    }
+
+    public void setInputTensorInfo(TensorInfo inputTensorInfo) {
+        this.inputTensorInfo = inputTensorInfo;
+    }
+
+    public TensorInfo getOutputTensorInfo() {
+        return outputTensorInfo;
+    }
+
+    public void setOutputTensorInfo(TensorInfo outputTensorInfo) {
+        this.outputTensorInfo = outputTensorInfo;
     }
 
     public String getModelPath() {

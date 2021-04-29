@@ -4,9 +4,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.clickbait.tflow.config.ClickBaitModel;
 import com.clickbait.tflow.dataSource.DBCPDataSource;
+import com.clickbait.tflow.exchange.LinkScoreBatchRequest;
 import com.clickbait.tflow.exchange.LinkScoreRequest;
 import com.clickbait.tflow.utilities.ClickBaitModelUtilities;
 import com.sun.net.httpserver.HttpExchange;
@@ -14,10 +17,10 @@ import com.sun.net.httpserver.HttpExchange;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Tensor;
 
-public class GetScore extends AbsRootController<String, LinkScoreRequest, Float> {
+public class GetScores extends AbsRootController<String[], List<LinkScoreRequest>, Float> {
     private final DecimalFormat df = new DecimalFormat("#.######");
 
-    public GetScore(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model, ClickBaitModel config,
+    public GetScores(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model, ClickBaitModel config,
             String userId) {
         super(exchange, dbConn, model, config, userId);
     }
@@ -25,8 +28,9 @@ public class GetScore extends AbsRootController<String, LinkScoreRequest, Float>
     @Override
     public void run() {
         try (Connection con = dbConn.getConnection()) {
-            String link = getBody(LinkScoreRequest.class).getLink();
-            LinkScoreRequest a = classify(link);
+            List<LinkScoreRequest> link = classify(getBody(LinkScoreBatchRequest.class).getLinks().stream()
+                    .map(a -> a.getLink()).toArray(String[]::new));
+            LinkScoreBatchRequest a = new LinkScoreBatchRequest(link);
             exchange.sendResponseHeaders(200, a.toString().length());
             OutputStream os = exchange.getResponseBody();
             os.write(a.toString().getBytes());
@@ -43,15 +47,23 @@ public class GetScore extends AbsRootController<String, LinkScoreRequest, Float>
     }
 
     @Override
-    protected Tensor<Float> getInputTensor(String input) {
+    protected Tensor<Float> getInputTensor(String[] input) {
         return ClickBaitModelUtilities.get().getUrl(input);
     }
 
     @Override
-    protected LinkScoreRequest convertToResult(Tensor<Float> output, String input) {
+    protected List<LinkScoreRequest> convertToResult(Tensor<Float> output, String[] input) {
         int axiz0 = (int) output.shape()[0];
         int axiz1 = (int) output.shape()[1];
-        float result = output.copyTo(new float[axiz0][axiz1])[0][0];
-        return new LinkScoreRequest(input, df.format(result));
+        float[][] result = output.copyTo(new float[axiz0][axiz1]);
+        return convertToScoredLinks(result, input);
+    }
+
+    private List<LinkScoreRequest> convertToScoredLinks(float[][] res, String[] input) {
+        List<LinkScoreRequest> found = new ArrayList<>();
+        for (int i = 0; i < res.length; ++i) {
+            found.add(new LinkScoreRequest(input[i], df.format(res[i][0])));
+        }
+        return found;
     }
 }
