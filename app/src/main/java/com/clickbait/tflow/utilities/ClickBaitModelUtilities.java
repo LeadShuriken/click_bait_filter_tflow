@@ -19,7 +19,7 @@ public class ClickBaitModelUtilities {
 
     private static ClickBaitModelUtilities sigleInstance = null;
     // NO DUAL PURPOSE / VAL / MATCH
-    private final Pattern urlPattern = Pattern.compile("(([^\\/|=|?|_|-]+)(?=(\\.\\w+$)|(/+$)|-|_))+");
+    private final Pattern urlPattern = Pattern.compile("(([^\\/|=|?|_|-]+)(?=(\\.\\w+$)|(\\/+$)|-|_))+");
 
     private final Map<String, Integer> clickBaitMapping;
     private final ClickBaitModel prop;
