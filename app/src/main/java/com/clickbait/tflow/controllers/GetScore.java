@@ -3,8 +3,6 @@ package com.clickbait.tflow.controllers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
-import java.sql.Connection;
-import java.text.DecimalFormat;
 
 import com.clickbait.tflow.config.ClickBaitModel;
 import com.clickbait.tflow.dataSource.DBCPDataSource;
@@ -16,7 +14,6 @@ import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Tensor;
 
 public class GetScore extends AbsRootController<String, LinkScoreRequest> {
-    private final DecimalFormat df = new DecimalFormat("#.######");
 
     public GetScore(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model, ClickBaitModel config,
             String userId) {
@@ -25,8 +22,8 @@ public class GetScore extends AbsRootController<String, LinkScoreRequest> {
 
     @Override
     public void run() {
-        try (Connection con = dbConn.getConnection()) {
-            String link = getBody(LinkScoreRequest.class).getLink();
+        try {
+            String link = getBody(LinkScoreRequest.class).getName();
             LinkScoreRequest a = classify(link);
             exchange.sendResponseHeaders(200, a.toString().length());
             OutputStream os = exchange.getResponseBody();
@@ -51,6 +48,6 @@ public class GetScore extends AbsRootController<String, LinkScoreRequest> {
     @Override
     protected LinkScoreRequest convertToResult(Tensor tensor, String input) {
         ByteBuffer bbuf = ClickBaitModelUtilities.get().getBuffer(tensor);
-        return new LinkScoreRequest(input, df.format(bbuf.asFloatBuffer().get(0)));
+        return new LinkScoreRequest(input, bbuf.asFloatBuffer().get(0));
     }
 }

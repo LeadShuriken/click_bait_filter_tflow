@@ -32,5 +32,4 @@ public class Endpoint {
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
     }
-
 }

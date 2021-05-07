@@ -15,6 +15,6 @@ public class LinkScoreBatchRequest {
 
     @Override
     public String toString() {
-        return "{\"links\":[" + getLinks().toString() + "]}";
+        return "{\"links\":" + getLinks() + "}";
     }
 }

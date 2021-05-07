@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
-import java.sql.Connection;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +18,6 @@ import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Tensor;
 
 public class GetScores extends AbsRootController<String[], List<LinkScoreRequest>> {
-    private final DecimalFormat df = new DecimalFormat("#.######");
 
     public GetScores(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model, ClickBaitModel config,
             String userId) {
@@ -29,9 +26,9 @@ public class GetScores extends AbsRootController<String[], List<LinkScoreRequest
 
     @Override
     public void run() {
-        try (Connection con = dbConn.getConnection()) {
+        try {
             List<LinkScoreRequest> link = classify(getBody(LinkScoreBatchRequest.class).getLinks().stream()
-                    .map(a -> a.getLink()).toArray(String[]::new));
+                    .map(a -> a.getName()).toArray(String[]::new));
             LinkScoreBatchRequest a = new LinkScoreBatchRequest(link);
             exchange.sendResponseHeaders(200, a.toString().length());
             OutputStream os = exchange.getResponseBody();
@@ -71,7 +68,7 @@ public class GetScores extends AbsRootController<String[], List<LinkScoreRequest
     private List<LinkScoreRequest> convertToScoredLinks(float[] res, String[] input) {
         List<LinkScoreRequest> found = new ArrayList<>();
         for (int i = 0; i < res.length; ++i) {
-            found.add(new LinkScoreRequest(input[i], df.format(res[i])));
+            found.add(new LinkScoreRequest(input[i], res[i]));
         }
         return found;
     }

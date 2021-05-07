@@ -2,6 +2,7 @@ package com.clickbait.tflow.utilities;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.List;
 import org.tensorflow.Tensor;
@@ -26,7 +27,7 @@ public class ClickBaitModelUtilities {
     private static ClickBaitModelUtilities sigleInstance = null;
     // NO DUAL PURPOSE / VAL / MATCH
     private final Pattern urlPattern = Pattern.compile("(([^\\/|=|?|_|-]+)(?=(\\.\\w+$)|(\\/+$)|-|_))+");
-
+    private final DecimalFormat df = new DecimalFormat("#.####");
     private final Map<String, Integer> clickBaitMapping;
     private final ClickBaitModel prop;
     private final int tLength;
@@ -127,5 +128,9 @@ public class ClickBaitModelUtilities {
         ByteBuffer bbuf = ByteBuffer.allocate((int) tensor.numBytes()).order(ByteOrder.nativeOrder());
         tensor.asRawTensor().data().copyTo(DataBuffers.of(bbuf), tensor.numBytes());
         return bbuf;
+    }
+
+    public float floatR(Float value) {
+        return Float.valueOf(df.format(value));
     }
 }

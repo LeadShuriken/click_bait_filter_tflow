@@ -1,24 +1,24 @@
 package com.clickbait.tflow.exchange;
 
 public class LinkScoreRequest {
-    private final String link;
-    private final String score;
+    private final String name;
+    private final float score;
 
-    public LinkScoreRequest(String link, String score) {
-        this.link = link;
+    public LinkScoreRequest(String name, float score) {
         this.score = score;
+        this.name = name;
     }
 
-    public String getLink() {
-        return link;
+    public String getName() {
+        return name;
     }
 
-    public String getScore() {
+    public Float getScore() {
         return score;
     }
 
     @Override
     public String toString() {
-        return "{\"link\":\"" + getLink() + "\",\"score\":\"" + getScore() + "\"}";
+        return "{\"name\":\"" + getName() + "\",\"score\":\"" + getScore() + "\"}";
     }
 }
