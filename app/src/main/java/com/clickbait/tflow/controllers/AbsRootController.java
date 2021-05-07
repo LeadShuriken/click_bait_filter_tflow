@@ -17,7 +17,7 @@ import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
 
-public abstract class AbsRootController<I, O, T> extends Thread implements Classifier<I, O> {
+public abstract class AbsRootController<I, O> extends Thread implements Classifier<I, O> {
 
     protected final HttpExchange exchange;
     protected final DBCPDataSource dbConn;
