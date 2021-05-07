@@ -2,6 +2,8 @@ package com.clickbait.tflow.controllers;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.sql.Connection;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import com.sun.net.httpserver.HttpExchange;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Tensor;
 
-public class GetScores extends AbsRootController<String[], List<LinkScoreRequest>, Float> {
+public class GetScores extends AbsRootController<String[], List<LinkScoreRequest>> {
     private final DecimalFormat df = new DecimalFormat("#.######");
 
     public GetScores(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model, ClickBaitModel config,
@@ -47,22 +49,29 @@ public class GetScores extends AbsRootController<String[], List<LinkScoreRequest
     }
 
     @Override
-    protected Tensor<Float> getInputTensor(String[] input) {
+    protected Tensor getInputTensor(String[] input) {
         return ClickBaitModelUtilities.get().getUrl(input);
     }
 
     @Override
-    protected List<LinkScoreRequest> convertToResult(Tensor<Float> output, String[] input) {
-        int axiz0 = (int) output.shape()[0];
-        int axiz1 = (int) output.shape()[1];
-        float[][] result = output.copyTo(new float[axiz0][axiz1]);
-        return convertToScoredLinks(result, input);
+    protected List<LinkScoreRequest> convertToResult(Tensor tensor, String[] input) {
+        int axiz0 = (int) tensor.shape().asArray()[0];
+        float[] res = new float[axiz0];
+
+        ByteBuffer bbuf = ClickBaitModelUtilities.get().getBuffer(tensor);
+
+        FloatBuffer b = bbuf.asFloatBuffer();
+        for (int i = 0; i < res.length; i++) {
+            res[i] = b.get(i);
+        }
+
+        return convertToScoredLinks(res, input);
     }
 
-    private List<LinkScoreRequest> convertToScoredLinks(float[][] res, String[] input) {
+    private List<LinkScoreRequest> convertToScoredLinks(float[] res, String[] input) {
         List<LinkScoreRequest> found = new ArrayList<>();
         for (int i = 0; i < res.length; ++i) {
-            found.add(new LinkScoreRequest(input[i], df.format(res[i][0])));
+            found.add(new LinkScoreRequest(input[i], df.format(res[i])));
         }
         return found;
     }

@@ -20,8 +20,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import org.tensorflow.SavedModelBundle;
-import org.tensorflow.framework.MetaGraphDef;
-import org.tensorflow.framework.SignatureDef;
 
 import io.jsonwebtoken.JwtException;
 
@@ -37,9 +35,7 @@ public class ClientHttpHandler implements HttpHandler {
         jwt = new JWTUtils(config.getEncryption().getJwtConfig());
         dsource = DBCPDataSource.getInstance(config.getDatasource());
         nlpModel = SavedModelBundle.load(config.getModels().getClickBaitModel().getModelPath(), "serve");
-
-        MetaGraphDef metaGraphDef = MetaGraphDef.parseFrom(nlpModel.metaGraphDef());
-        final SignatureDef signatureDef = metaGraphDef.getSignatureDefMap().get("serving_default");
+        var signatureDef = nlpModel.metaGraphDef().getSignatureDefMap().get("serving_default");
 
         nlpConfig = config.getModels().getClickBaitModel();
 

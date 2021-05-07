@@ -9,11 +9,10 @@ import com.sun.net.httpserver.HttpExchange;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
 import org.tensorflow.Tensor;
-
+import com.google.gson.Gson;
 import com.clickbait.tflow.config.ClickBaitModel;
 import com.clickbait.tflow.dataSource.DBCPDataSource;
 import com.clickbait.tflow.interfaces.Classifier;
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import java.io.IOException;
@@ -30,9 +29,9 @@ public abstract class AbsRootController<I, O, T> extends Thread implements Class
 
     public abstract void run();
 
-    protected abstract Tensor<T> getInputTensor(I input);
+    protected abstract Tensor getInputTensor(I input);
 
-    protected abstract O convertToResult(Tensor<T> output, I input);
+    protected abstract O convertToResult(Tensor output, I input);
 
     protected AbsRootController(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model,
             ClickBaitModel config, String userId) {
@@ -62,12 +61,11 @@ public abstract class AbsRootController<I, O, T> extends Thread implements Class
 
     public O classify(I input) {
         Session sees = model.session();
-        Tensor<T> inputTensor = getInputTensor(input);
-        List<Tensor<?>> outputs = sees.runner().feed(config.getInputTensorInfo().getName(), inputTensor)
+        Tensor inputTensor = getInputTensor(input);
+        List<Tensor> outputs = sees.runner().feed(config.getInputTensorInfo().getName(), inputTensor)
                 .fetch(config.getOutputTensorInfo().getName()).run();
 
-        try (@SuppressWarnings("unchecked")
-        Tensor<T> output = (Tensor<T>) outputs.get(0)) {
+        try (Tensor output = (Tensor) outputs.get(0)) {
             return convertToResult(output, input);
         }
     }

@@ -9,9 +9,9 @@ import org.yaml.snakeyaml.constructor.Constructor;
 
 import java.net.InetSocketAddress;
 
+import com.clickbait.tflow.utilities.ClickBaitModelUtilities;
 import com.clickbait.tflow.config.ApplicationConfig;
 import com.clickbait.tflow.config.Server;
-import com.clickbait.tflow.utilities.ClickBaitModelUtilities;
 import com.sun.net.httpserver.HttpServer;
 import java.util.concurrent.Executors;
 

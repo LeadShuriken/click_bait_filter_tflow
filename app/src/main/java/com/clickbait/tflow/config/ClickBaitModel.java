@@ -1,6 +1,6 @@
 package com.clickbait.tflow.config;
 
-import org.tensorflow.framework.TensorInfo;
+import org.tensorflow.proto.framework.TensorInfo;
 
 public class ClickBaitModel {
     private String modelPath;
