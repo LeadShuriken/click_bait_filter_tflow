@@ -2,6 +2,8 @@ package com.clickbait.tflow.controllers;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import com.sun.net.httpserver.HttpExchange;
@@ -32,6 +34,8 @@ public abstract class AbsRootController<I, O> extends Thread implements Classifi
     protected abstract Tensor getInputTensor(I input);
 
     protected abstract O convertToResult(Tensor output, I input);
+
+    protected abstract void updateDB(Connection con, O input) throws SQLException;
 
     protected AbsRootController(HttpExchange exchange, DBCPDataSource dbConn, SavedModelBundle model,
             ClickBaitModel config, String userId) {

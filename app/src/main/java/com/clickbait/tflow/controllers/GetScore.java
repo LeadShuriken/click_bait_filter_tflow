@@ -3,6 +3,9 @@ package com.clickbait.tflow.controllers;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import com.clickbait.tflow.config.ClickBaitModel;
 import com.clickbait.tflow.dataSource.DBCPDataSource;
@@ -22,13 +25,15 @@ public class GetScore extends AbsRootController<String, LinkScoreRequest> {
 
     @Override
     public void run() {
-        try {
+        try (Connection con = dbConn.getConnection()) {
             String link = getBody(LinkScoreRequest.class).getName();
             LinkScoreRequest a = classify(link);
             exchange.sendResponseHeaders(200, a.toString().length());
             OutputStream os = exchange.getResponseBody();
             os.write(a.toString().getBytes());
             os.close();
+
+            updateDB(con, a);
         } catch (Exception e) {
             try {
                 exchange.sendResponseHeaders(400, 0);
@@ -38,6 +43,15 @@ public class GetScore extends AbsRootController<String, LinkScoreRequest> {
             }
             e.printStackTrace();
         }
+    }
+
+    @Override
+    protected void updateDB(Connection con, LinkScoreRequest input) throws SQLException {
+        PreparedStatement cs = con.prepareStatement("CALL tflow.insert_link(?::tflow.link_type,?::tflow.bait_score)");
+        cs.setString(1, input.getName());
+        cs.setFloat(2, input.getScore());
+        cs.executeUpdate();
+        cs.close();
     }
 
     @Override

@@ -5,6 +5,8 @@
 build
 .vscode/**
 **/resources/**
+!**/resources/seed.sql
+
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 *.log

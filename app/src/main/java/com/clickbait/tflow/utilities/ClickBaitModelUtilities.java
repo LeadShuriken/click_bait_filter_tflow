@@ -23,10 +23,10 @@ import org.tensorflow.ndarray.StdArrays;
 import org.tensorflow.types.TFloat32;
 
 public class ClickBaitModelUtilities {
-
     private static ClickBaitModelUtilities sigleInstance = null;
     // NO DUAL PURPOSE / VAL / MATCH
     private final Pattern urlPattern = Pattern.compile("(([^\\/|=|?|_|-]+)(?=(\\.\\w+$)|(\\/+$)|-|_))+");
+
     private final DecimalFormat df = new DecimalFormat("#.####");
     private final Map<String, Integer> clickBaitMapping;
     private final ClickBaitModel prop;
@@ -130,7 +130,7 @@ public class ClickBaitModelUtilities {
         return bbuf;
     }
 
-    public float floatR(Float value) {
-        return Float.valueOf(df.format(value));
+    public String floatR(Float value) {
+        return df.format(value);
     }
 }
