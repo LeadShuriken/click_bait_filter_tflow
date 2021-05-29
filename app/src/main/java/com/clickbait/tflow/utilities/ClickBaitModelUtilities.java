@@ -82,7 +82,6 @@ public class ClickBaitModelUtilities {
                 .filter(x -> x.length > 3)
                 .findFirst()
                 .orElse(null);
-
     }
 
     public Tensor getUrl(String[] urls) {
@@ -93,18 +92,18 @@ public class ClickBaitModelUtilities {
             StringBuilder str = new StringBuilder(urls[i]);
 
             Matcher ma = urlPattern.matcher(str);
-            List<String> stringRes = new ArrayList<String>();
-
-            while (ma.find()) {
-                stringRes.add(ma.group(1));
-            }
-            if (stringRes.size() > 2) {
-                int len = stringRes.size();
-                int del = prop.isPostPadding() ? 0 : tLength - len;
-                for (int n = 0; n < len; n++) {
-                    res_inner[del + n] = getEntry(stringRes.get(n));
+            
+            if (ma.find() && !Strings.isNullOrEmpty(ma.group(1))) {
+                String[] stringRes = findSplit(ma.group(1));
+                if (stringRes != null) {
+                    int len = stringRes.length;
+                    int del = prop.isPostPadding() ? 0 : tLength - len;
+                    for (int n = 0; n < len; n++) {
+                        res_inner[del + n] = getEntry(stringRes[i]);
+                    }
                 }
             }
+
             res_outer[i] = res_inner;
         }
 
