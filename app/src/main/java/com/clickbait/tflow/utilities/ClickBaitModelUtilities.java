@@ -18,6 +18,8 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
 import com.clickbait.tflow.config.ClickBaitModel;
+import com.google.common.base.Strings;
+
 import org.tensorflow.ndarray.buffer.DataBuffers;
 import org.tensorflow.ndarray.StdArrays;
 import org.tensorflow.types.TFloat32;
@@ -25,7 +27,9 @@ import org.tensorflow.types.TFloat32;
 public class ClickBaitModelUtilities {
     private static ClickBaitModelUtilities sigleInstance = null;
     // NO DUAL PURPOSE / VAL / MATCH
-    private final Pattern urlPattern = Pattern.compile("(([^\\/|=|?|_|-]+)(?=(\\.\\w+$)|(\\/+$)|-|_))+");
+    private final Pattern urlPattern = Pattern.compile("([^\\/|\\.|\\?]+)(?=\\.|\\?|\\/+$|$)");
+    private final String[] splitOn = new String[] { "_", "-" };
+    private final String word = "^[a-z]+$";
 
     private final DecimalFormat df = new DecimalFormat("#.####");
     private final Map<String, Integer> clickBaitMapping;
@@ -54,20 +58,31 @@ public class ClickBaitModelUtilities {
         StringBuilder str = new StringBuilder(url);
 
         Matcher ma = urlPattern.matcher(str);
-        List<String> stringRes = new ArrayList<String>();
 
-        while (ma.find()) {
-            stringRes.add(ma.group(1));
-        }
-        if (stringRes.size() > 2) {
-            int len = stringRes.size();
-            int del = prop.isPostPadding() ? 0 : tLength - len;
-            for (int i = 0; i < len; i++) {
-                res[0][del + i] = getEntry(stringRes.get(i));
+        if (ma.find() && !Strings.isNullOrEmpty(ma.group(1))) {
+            String[] stringRes = findSplit(ma.group(1));
+            if (stringRes != null) {
+                int len = stringRes.length;
+                int del = prop.isPostPadding() ? 0 : tLength - len;
+                for (int i = 0; i < len; i++) {
+                    res[0][del + i] = getEntry(stringRes[i]);
+                }
             }
         }
 
         return TFloat32.tensorOf(StdArrays.ndCopyOf(res));
+    }
+
+    private String[] findSplit(String a) {
+        return Arrays.stream(splitOn)
+                .map(x -> a.split(x))
+                .map(x -> Arrays.stream(x)
+                        .filter(y -> y.matches(word))
+                        .toArray(String[]::new))
+                .filter(x -> x.length > 3)
+                .findFirst()
+                .orElse(null);
+
     }
 
     public Tensor getUrl(String[] urls) {
@@ -99,12 +114,6 @@ public class ClickBaitModelUtilities {
     private int getEntry(String st) {
         Integer r = clickBaitMapping.get(st);
         return r != null ? r : clickBaitMapping.get(prop.getNotFound());
-    }
-
-    private String[] findSplit(String a) {
-        return Arrays.stream(new String[] { "_", "-" }).map(x -> a.split(x))
-                .map(x -> Arrays.stream(x).filter(y -> y.matches("^[a-z]+$")).toArray(String[]::new))
-                .filter(x -> x.length > 3).findFirst().orElse(null);
     }
 
     private void replaceAll(StringBuilder sb, String pattern, String replacement) {
