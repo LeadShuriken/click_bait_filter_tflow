@@ -53,58 +53,44 @@ public class ClickBaitModelUtilities {
         this.prop = pr;
     }
 
-    public Tensor getUrl(String url) {
-        float[][] res = new float[1][tLength];
-        StringBuilder str = new StringBuilder(url);
-
-        Matcher ma = urlPattern.matcher(str);
-
+    private float[] getSection(Matcher ma) {
+        float[] res = new float[tLength];
         if (ma.find() && !Strings.isNullOrEmpty(ma.group(1))) {
             String[] stringRes = findSplit(ma.group(1));
             if (stringRes != null) {
                 int len = stringRes.length;
                 int del = prop.isPostPadding() ? 0 : tLength - len;
                 for (int i = 0; i < len; i++) {
-                    res[0][del + i] = getEntry(stringRes[i]);
+                    res[del + i] = getEntry(stringRes[i]);
                 }
             }
         }
+        return res;
+    }
+
+    public Tensor getUrl(String url) {
+        float[][] res = new float[1][tLength];
+        StringBuilder str = new StringBuilder(url);
+        Matcher ma = urlPattern.matcher(str);
+        res[0] = getSection(ma);
 
         return TFloat32.tensorOf(StdArrays.ndCopyOf(res));
     }
 
     private String[] findSplit(String a) {
-        return Arrays.stream(splitOn)
-                .map(x -> a.split(x))
-                .map(x -> Arrays.stream(x)
-                        .filter(y -> y.matches(word))
-                        .toArray(String[]::new))
-                .filter(x -> x.length > 3)
-                .findFirst()
-                .orElse(null);
+        return Arrays.stream(splitOn).map(x -> a.split(x))
+                .map(x -> Arrays.stream(x).filter(y -> y.matches(word)).toArray(String[]::new))
+                .filter(x -> x.length > 3).findFirst().orElse(null);
     }
 
     public Tensor getUrl(String[] urls) {
         float[][] res_outer = new float[urls.length][tLength];
 
         for (int i = 0; i < urls.length; i++) {
-            float[] res_inner = new float[tLength];
             StringBuilder str = new StringBuilder(urls[i]);
 
             Matcher ma = urlPattern.matcher(str);
-            
-            if (ma.find() && !Strings.isNullOrEmpty(ma.group(1))) {
-                String[] stringRes = findSplit(ma.group(1));
-                if (stringRes != null) {
-                    int len = stringRes.length;
-                    int del = prop.isPostPadding() ? 0 : tLength - len;
-                    for (int n = 0; n < len; n++) {
-                        res_inner[del + n] = getEntry(stringRes[i]);
-                    }
-                }
-            }
-
-            res_outer[i] = res_inner;
+            res_outer[i] = getSection(ma);
         }
 
         return TFloat32.tensorOf(StdArrays.ndCopyOf(res_outer));
